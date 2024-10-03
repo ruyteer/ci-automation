@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Extrator de Dados de PDF</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Extrator de Dados de PDF</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".pdf" required>
+            <button type="submit">Carregar PDF</button>
+        </form>
+        {% if data %}
+            <h2>Processo concluído:</h2>
+            <p>Código Requisição: {{ data['codigo_requisicao'] }}</p>
+            <p>Solicitante: {{ data['solicitante'] }}</p>
+            <p>Local de Entrega: {{ data['local_entrega'] }}</p>
+            <p>Justificativa: {{ data['justificativa'] }}</p>
+            <p>Valor Total: {{ data['valor_total'] }}</p>
+            <h3>Itens:</h3>
+            <ul>
+                {% for item in data['itens'] %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+            <h3>Visualização do PDF:</h3>
+            <iframe src="{{ url_for('upload_file', filename=pdf_filename) }}" width="100%" height="600px"></iframe>
+        {% endif %}
+    </div>
+</body>
+</html>
