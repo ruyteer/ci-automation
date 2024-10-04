@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, send_from_directory
 import os
 from PyPDF2 import PdfReader
 import re
+from docx import Document
+from docxtpl import DocxTemplate
 
 app = Flask(__name__)
 
@@ -17,7 +19,6 @@ def extract_data_from_pdf(pdf_path):
         'itens': []
     }
 
-    # Percorrer todas as páginas do PDF
     for page in reader.pages:
         text = page.extract_text()
         if text:
@@ -44,28 +45,10 @@ def extract_data_from_pdf(pdf_path):
             if valor_total_match:
                 data['valor_total'] = valor_total_match.group(1).strip()
 
-            itens_match = re.search(r'Linhas(.*?)(?=Solicitante)', text, re.DOTALL)
-            if itens_match:
-                itens_text = itens_match.group(1).strip()
-                item_lines = re.split(r'\s*(?=\d+\s+ES\.)', itens_text)
-
-                header_to_remove = "LinhaItem Descrição Nomeda CategoriaQuantid adeUDM Preço Valor(BRL) Status"
-                cleaned_item_lines = [item.replace(header_to_remove, '').strip() for item in item_lines if item]
-
-                for item in cleaned_item_lines:
-                    item = item.replace('\n', ' ').strip()
-                    item = re.sub(r'(\d+)\s*(ES\.)', r'\1, \2', item)
-                    item = re.sub(r'(?<=\d)\s+', r' ', item)
-                    item = re.sub(r'\s+(PC|BRL)\s+', r' \1 ', item)
-                    item = re.sub(r'\s+', ' ', item)
-                    if item:
-                        data['itens'].append(item.strip())
-
     return data
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    # Cria o diretório 'uploads' se não existir
     if not os.path.exists('uploads'):
         os.makedirs('uploads')
 
@@ -81,6 +64,59 @@ def home():
 @app.route('/uploads/<filename>')
 def upload_file(filename):
     return send_from_directory('uploads', filename)
+
+@app.route('/gerar_ci', methods=["POST"])
+def gerar_ci():
+    # Pegar os dados do formulário
+    data = {
+        'codigo_requisicao': request.form['codigo_requisicao'],
+        'solicitante': request.form['solicitante'],
+        'local_entrega': request.form['local_entrega'],
+        'justificativa': request.form['justificativa'],
+        'valor_total': request.form['valor_total'],
+        'itens': []
+    }
+
+    # Pegar os itens do formulário
+    quantidades = request.form.getlist('quantidade[]')
+    descricoes = request.form.getlist('descricao[]')
+    precos = request.form.getlist('preco[]')
+
+    for i in range(len(quantidades)):
+        item = {
+            'quantidade': quantidades[i],
+            'descricao': descricoes[i],
+            'preco': precos[i]
+        }
+        data['itens'].append(item)
+
+    # Preencher o modelo Word
+    word_output_path = os.path.join("uploads", "CI_preenchida.docx")
+    preencher_modelo_word(data, word_output_path)
+
+    # Retornar o arquivo Word preenchido para o usuário baixar
+    return send_from_directory('uploads', "CI_preenchida.docx", as_attachment=True)
+
+
+def preencher_modelo_word(data, word_output_path):
+    doc = DocxTemplate("modelo_ci.docx")
+
+    context = {
+        'COD_ARQ': 135,
+        'DATA': '03 de outubro, ',
+        'CODIGO': data['codigo_requisicao'],
+        'SOLICITANTE': data['solicitante'],
+        'LOCAL_ENTREGA': data['local_entrega'],
+        'VALOR_TOTAL': data['valor_total'],
+        'JUSTIFICATIVA': data['justificativa'],
+        'itens': [{'quantidade': item['quantidade'], 'descricao': item['descricao'], 'preco': item['preco']} for item in data['itens']]
+    }
+
+    # Renderiza o template
+    doc.render(context)
+
+    # Salva o documento preenchido
+    doc.save(word_output_path)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=3000)

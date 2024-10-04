@@ -1,34 +1,113 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
     <title>Extrator de Dados de PDF</title>
-</head>
-<body>
+    <script>
+      function addItem() {
+        const itemContainer = document.getElementById("items");
+        const itemDiv = document.createElement("div");
+        itemDiv.classList.add("item");
+
+        itemDiv.innerHTML = `
+                <input type="text" name="quantidade[]" placeholder="Quantidade" required />
+                <input type="text" name="descricao[]" placeholder="Descrição" required />
+                <input type="text" name="preco[]" placeholder="Preço" required />
+                <button type="button" onclick="removeItem(this)">Remover</button>
+            `;
+        itemContainer.appendChild(itemDiv);
+      }
+
+      function removeItem(button) {
+        const itemDiv = button.parentNode;
+        itemDiv.parentNode.removeChild(itemDiv);
+      }
+    </script>
+  </head>
+  <body>
     <div class="container">
-        <h1>Extrator de Dados de PDF</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".pdf" required>
-            <button type="submit">Carregar PDF</button>
-        </form>
-        {% if data %}
-            <h2>Processo concluído:</h2>
-            <p>Código Requisição: {{ data['codigo_requisicao'] }}</p>
-            <p>Solicitante: {{ data['solicitante'] }}</p>
-            <p>Local de Entrega: {{ data['local_entrega'] }}</p>
-            <p>Justificativa: {{ data['justificativa'] }}</p>
-            <p>Valor Total: {{ data['valor_total'] }}</p>
-            <h3>Itens:</h3>
-            <ul>
-                {% for item in data['itens'] %}
-                    <li>{{ item }}</li>
-                {% endfor %}
-            </ul>
-            <h3>Visualização do PDF:</h3>
-            <iframe src="{{ url_for('upload_file', filename=pdf_filename) }}" width="100%" height="600px"></iframe>
-        {% endif %}
+      <h1>Extrator de Dados de PDF</h1>
+      <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf" required />
+        <button type="submit">Carregar PDF</button>
+      </form>
+      {% if data %}
+      <h2>Processo concluído:</h2>
+      <form method="POST" action="{{ url_for('gerar_ci') }}">
+        <div class="form-data">
+          <p>Código Requisição:</p>
+          <input
+            type="text"
+            name="codigo_requisicao"
+            value="{{ data['codigo_requisicao'] }}"
+          />
+        </div>
+        <div class="form-data">
+          <p>Solicitante:</p>
+          <input
+            type="text"
+            name="solicitante"
+            value="{{ data['solicitante'] }}"
+          />
+        </div>
+        <div class="form-data">
+          <p>Local de Entrega:</p>
+          <input
+            type="text"
+            name="local_entrega"
+            value="{{ data['local_entrega'] }}"
+          />
+        </div>
+        <div class="form-data">
+          <p>Justificativa:</p>
+          <textarea name="justificativa">{{ data['justificativa'] }}</textarea>
+        </div>
+        <div class="form-data">
+          <p>Valor Total:</p>
+          <input
+            type="text"
+            name="valor_total"
+            value="{{ data['valor_total'] }}"
+          />
+        </div>
+
+        <h3>Itens:</h3>
+        <div id="items">
+          {% for item in data['itens'] %}
+          <div class="item">
+            <input
+              type="text"
+              name="quantidade[]"
+              placeholder="Quantidade"
+              required
+            />
+            <input
+              type="text"
+              name="descricao[]"
+              placeholder="Descrição"
+              required
+            />
+            <input type="text" name="preco[]" placeholder="Preço" required />
+            <button type="button" onclick="removeItem(this)">Remover</button>
+          </div>
+          {% endfor %}
+        </div>
+        <button type="button" onclick="addItem()">Adicionar Item</button>
+
+        <button type="submit">Gerar CI</button>
+      </form>
+      <h3>Visualização da Requisição:</h3>
+      <iframe
+        src="{{ url_for('upload_file', filename=pdf_filename) }}"
+        width="100%"
+        height="600px"
+      ></iframe>
+      {% endif %}
     </div>
-</body>
+  </body>
 </html>
