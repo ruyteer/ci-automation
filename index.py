@@ -114,9 +114,13 @@ def preencher_modelo_word(data, word_output_path):
         'LOCAL_ENTREGA': data['local_entrega'],
         'VALOR_TOTAL': data['valor_total'],
         'JUSTIFICATIVA': data['justificativa'],
-        'ITENS': [f'{item['quantidade']} {item['descricao']} {item['preco']}' for item in data['itens']]
+        'ITENS': []
     }
 
+    for item in data['itens']:
+        formatted_item = f"Quantidade: {item['quantidade']} | Descrição: {item['descricao']} | Preço: {item['preco']}"
+        context['ITENS'].append(formatted_item)
+        
     # Renderiza o template
     doc.render(context)
 
