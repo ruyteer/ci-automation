@@ -82,6 +82,10 @@ def gerar_ci():
     descricoes = request.form.getlist('descricao[]')
     precos = request.form.getlist('preco[]')
 
+    date = request.form.get('data')
+    cod_arq = request.form.get('cod_arq')
+    motivo = request.form.get('motivo')
+
     for i in range(len(quantidades)):
         item = {
             'quantidade': quantidades[i],
@@ -102,8 +106,8 @@ def preencher_modelo_word(data, word_output_path):
     doc = DocxTemplate("modelo_ci.docx")
 
     context = {
-        'COD_ARQ': 135,
-        'DATA': '03 de outubro, ',
+        'COD_ARQ': cod_arq,
+        'DATA': date,
         'CODIGO': data['codigo_requisicao'],
         'SOLICITANTE': data['solicitante'],
         'LOCAL_ENTREGA': data['local_entrega'],

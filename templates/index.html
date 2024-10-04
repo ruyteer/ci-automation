@@ -64,15 +64,27 @@
           />
         </div>
         <div class="form-data">
+          <p>Código do arquivo:</p>
+          <input name="cod_arq" placeholder="Código do arquivo"/>
+        </div>
+        <div class="form-data">
+          <p>Data:</p>
+          <input name="data" placeholder="04 de outubro"/>
+        </div>
+        <div class="form-data">
           <p>Justificativa:</p>
           <textarea name="justificativa">{{ data['justificativa'] }}</textarea>
+        </div>
+        <div class="form-data">
+          <p>Motivo:</p>
+          <textarea name="motivo">{{ data['justificativa'] }}</textarea>
         </div>
         <div class="form-data">
           <p>Valor Total:</p>
           <input
             type="text"
             name="valor_total"
-            value="{{ data['valor_total'] }}"
+            value="{{ data['valor_total'] }}, 00"
           />
         </div>
 
