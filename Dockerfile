@@ -8,6 +8,8 @@ WORKDIR /app
 COPY requirements.txt .
 COPY index.py .
 COPY modelo_ci.docx .
+COPY /templates/index.html .
+COPY /static/styles.css .
 
 # Instalar as dependências
 RUN pip install --no-cache-dir -r requirements.txt
