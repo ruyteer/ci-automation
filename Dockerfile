@@ -13,7 +13,7 @@ COPY modelo_ci.docx .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expor a porta que o Flask usará
-EXPOSE 3000
+EXPOSE 3434
 
 # Comando para iniciar a aplicação
 CMD ["python", "index.py"]
