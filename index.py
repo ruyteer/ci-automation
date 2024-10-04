@@ -74,6 +74,9 @@ def gerar_ci():
         'local_entrega': request.form['local_entrega'],
         'justificativa': request.form['justificativa'],
         'valor_total': request.form['valor_total'],
+        'motivo': request.form['motivo'],
+        'cod_arq': request.form['cod_arq'],
+        'date': request.form['data'],
         'itens': []
     }
 
@@ -82,9 +85,7 @@ def gerar_ci():
     descricoes = request.form.getlist('descricao[]')
     precos = request.form.getlist('preco[]')
 
-    date = request.form.get('data')
-    cod_arq = request.form.get('cod_arq')
-    motivo = request.form.get('motivo')
+    
 
     for i in range(len(quantidades)):
         item = {
@@ -106,8 +107,8 @@ def preencher_modelo_word(data, word_output_path):
     doc = DocxTemplate("modelo_ci.docx")
 
     context = {
-        'COD_ARQ': cod_arq,
-        'DATA': date,
+        'COD_ARQ': data['cod_arq'],
+        'DATA': data['date'],
         'CODIGO': data['codigo_requisicao'],
         'SOLICITANTE': data['solicitante'],
         'LOCAL_ENTREGA': data['local_entrega'],
