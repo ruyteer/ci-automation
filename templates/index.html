@@ -65,11 +65,11 @@
         </div>
         <div class="form-data">
           <p>Código do arquivo:</p>
-          <input name="cod_arq" placeholder="Código do arquivo"/>
+          <input name="cod_arq" placeholder="Código do arquivo" />
         </div>
         <div class="form-data">
           <p>Data:</p>
-          <input name="data" placeholder="04 de outubro"/>
+          <input name="data" placeholder="04 de outubro" />
         </div>
         <div class="form-data">
           <p>Justificativa:</p>
@@ -77,14 +77,23 @@
         </div>
         <div class="form-data">
           <p>Motivo:</p>
-          <textarea name="motivo">{{ data['justificativa'] }}</textarea>
+          <textarea name="motivo" placeholder="Motivo"></textarea>
         </div>
         <div class="form-data">
           <p>Valor Total:</p>
           <input
             type="text"
             name="valor_total"
-            value="{{ data['valor_total'] }}, 00"
+            value="{{ data['valor_total'] }}"
+          />
+        </div>
+        <div class="form-data">
+          <p>Nome do arquivo:</p>
+          <input
+            class="large-input"
+            type="text"
+            name="name_file"
+            value="CI - COMPRAS - DF00 (NUMERO) .2024 - {{ data['codigo_requisicao'] }} - DESCRICAO - {{ data['local_entrega'] }}"
           />
         </div>
 

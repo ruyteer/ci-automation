@@ -77,6 +77,7 @@ def gerar_ci():
         'motivo': request.form['motivo'],
         'cod_arq': request.form['cod_arq'],
         'date': request.form['data'],
+        'name_file': request.form['name_file'],
         'itens': []
     }
 
@@ -99,8 +100,9 @@ def gerar_ci():
     word_output_path = os.path.join("uploads", "CI_preenchida.docx")
     preencher_modelo_word(data, word_output_path)
 
+    nameFile = f"{data['name_file']}.docx"
     # Retornar o arquivo Word preenchido para o usuário baixar
-    return send_from_directory('uploads', "CI_preenchida.docx", as_attachment=True)
+    return send_from_directory('uploads', nameFile, as_attachment=True)
 
 
 def preencher_modelo_word(data, word_output_path):
@@ -118,7 +120,7 @@ def preencher_modelo_word(data, word_output_path):
     }
 
     for item in data['itens']:
-        formatted_item = f"{item['quantidade']} | {item['descricao']} | {item['preco']}"
+        formatted_item = f"{item['quantidade']} | {item['descricao']} | R$ {item['preco']}"
         context['ITENS'].append(formatted_item)
 
     # Renderiza o template

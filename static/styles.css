@@ -46,3 +46,7 @@ input[type="file"] {
   gap: 5px;
   align-items: center;
 }
+
+.large-input {
+  width: 300px;
+}
