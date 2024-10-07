@@ -3,3 +3,4 @@ PyPDF2
 python-docx
 docxtpl
 aspose-words
+pypandoc
