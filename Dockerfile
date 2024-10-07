@@ -11,6 +11,7 @@ COPY modelo_ci.docx .
 COPY templates/ templates/
 COPY static/ static/
 COPY uploads/ uploads
+COPY functions/ functions
 
 # Instalar as dependências
 RUN pip install --no-cache-dir -r requirements.txt
