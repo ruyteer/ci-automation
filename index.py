@@ -1,51 +1,10 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, send_file
 import os
-from PyPDF2 import PdfReader
-import re
-from docx import Document
-from docxtpl import DocxTemplate
+from functions.get_req import get_data_from_req
+from functions.generate_ci import preencher_modelo_word
+import zipfile
 
 app = Flask(__name__)
-
-# Função para extrair dados do PDF
-def extract_data_from_pdf(pdf_path):
-    reader = PdfReader(pdf_path)
-    data = {
-        'codigo_requisicao': None,
-        'solicitante': None,
-        'local_entrega': None,
-        'justificativa': None,
-        'valor_total': None,
-        'itens': []
-    }
-
-    for page in reader.pages:
-        text = page.extract_text()
-        if text:
-            text = text.replace('\n', ' ').strip()
-
-            codigo_match = re.search(r'REQDF[-\s]*(\d+)', text)
-            if codigo_match:
-                data['codigo_requisicao'] = f"REQDF-{codigo_match.group(1).strip()}"
-
-            solicitante_match = re.search(r'Solicitante\s+([A-Z\s]+)\s+Fornecedor', text)
-            if solicitante_match:
-                data['solicitante'] = solicitante_match.group(1).strip()
-
-            local_entrega_match = re.search(r'Local para Entrega\s+(.*?)\s+Telefone', text)
-            if local_entrega_match:
-                data['local_entrega'] = local_entrega_match.group(1).strip()
-
-            justificativa_match = re.search(r'Justificativa\s+(.*?)(?=\s+Linhas)', text, re.DOTALL)
-            if justificativa_match:
-                justificativa = justificativa_match.group(1).replace('\n', ' ').strip()
-                data['justificativa'] = ' '.join(justificativa.split())
-
-            valor_total_match = re.search(r'Valor da Requisição\s+([\d.,]+)\s+BRL', text)
-            if valor_total_match:
-                data['valor_total'] = valor_total_match.group(1).strip()
-
-    return data
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -57,7 +16,7 @@ def home():
         if uploaded_file.filename.endswith('.pdf'):
             pdf_path = os.path.join("uploads", uploaded_file.filename)
             uploaded_file.save(pdf_path)
-            data = extract_data_from_pdf(pdf_path)
+            data = get_data_from_req(pdf_path)
             return render_template("index.html", data=data, pdf_filename=uploaded_file.filename)
     return render_template("index.html", data=None, pdf_filename=None)
 
@@ -86,8 +45,6 @@ def gerar_ci():
     descricoes = request.form.getlist('descricao[]')
     precos = request.form.getlist('preco[]')
 
-    
-
     for i in range(len(quantidades)):
         item = {
             'quantidade': quantidades[i],
@@ -96,38 +53,25 @@ def gerar_ci():
         }
         data['itens'].append(item)
 
-    # Preencher o modelo Word
-    word_output_path = os.path.join("uploads", "CI_preenchida.docx")
-    preencher_modelo_word(data, word_output_path)
+    name_file = f"{data['name_file']}.docx"
+    word_output_path = os.path.join("uploads", name_file)
 
-    nameFile = f"{data['name_file']}.docx"
-    # Retornar o arquivo Word preenchido para o usuário baixar
-    return send_from_directory('uploads', nameFile, as_attachment=True)
+    # Preencher o modelo Word e converter para PDF
+    pdf_filename = preencher_modelo_word(data, word_output_path)
 
+    if not pdf_filename:
+        return "Erro ao gerar o arquivo PDF", 500
 
-def preencher_modelo_word(data, word_output_path):
-    doc = DocxTemplate("modelo_ci.docx")
+    # Criar o arquivo ZIP contendo o Word e o PDF
+    zip_filename = f"{data['name_file']}.zip"
+    zip_path = os.path.join("uploads", zip_filename)
 
-    context = {
-        'COD_ARQ': data['cod_arq'],
-        'DATA': data['date'],
-        'CODIGO': data['codigo_requisicao'],
-        'SOLICITANTE': data['solicitante'],
-        'LOCAL_ENTREGA': data['local_entrega'],
-        'VALOR_TOTAL': data['valor_total'],
-        'JUSTIFICATIVA': data['justificativa'],
-        'ITENS': []
-    }
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
+        zipf.write(word_output_path, os.path.basename(word_output_path))
+        zipf.write(os.path.join("uploads", pdf_filename), pdf_filename)
 
-    for item in data['itens']:
-        formatted_item = f"{item['quantidade']} | {item['descricao']} | R$ {item['preco']}"
-        context['ITENS'].append(formatted_item)
-
-    # Renderiza o template
-    doc.render(context)
-
-    # Salva o documento preenchido
-    doc.save(word_output_path)
+    # Retornar o arquivo ZIP para o usuário baixar
+    return send_file(zip_path, as_attachment=True)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3000)
+    app.run(host='0.0.0.0', port=3001)
