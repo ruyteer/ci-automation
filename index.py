@@ -37,6 +37,7 @@ def gerar_ci():
         'cod_arq': request.form['cod_arq'],
         'date': request.form['data'],
         'name_file': request.form['name_file'],
+        'empresa': request.form['empresa'],
         'itens': []
     }
 

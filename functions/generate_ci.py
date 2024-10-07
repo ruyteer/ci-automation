@@ -21,6 +21,7 @@ def preencher_modelo_word(data, word_output_path):
         'VALOR_TOTAL': data['valor_total'],
         'JUSTIFICATIVA': data['justificativa'],
         'MOTIVO': data['motivo'],
+        'EMPRESA': data['empresa'],
         'ITENS': []
     }
 
