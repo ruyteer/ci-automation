@@ -37,15 +37,11 @@ def preencher_modelo_word(data, word_output_path):
     doc.save(word_output_path)
 
     # Extrair o nome do arquivo Word
-    word_filename = os.path.basename(word_output_path)
+    # word_filename = os.path.basename(word_output_path)
 
     # Converte o arquivo Word para PDF
-    pdf_filename = convert_to_pdf(folder="uploads", source=word_filename, timeout=15)
+    # pdf_filename = convert_to_pdf(folder="uploads", source=word_filename, timeout=15)
 
-    if pdf_filename:
-        return pdf_filename
-    else:
-        print("Erro ao gerar o arquivo PDF")
-        return None
+   
 
 

@@ -58,21 +58,10 @@ def gerar_ci():
     word_output_path = os.path.join("uploads", name_file)
 
     # Preencher o modelo Word e converter para PDF
-    pdf_filename = preencher_modelo_word(data, word_output_path)
-
-    if not pdf_filename:
-        return "Erro ao gerar o arquivo PDF", 500
-
-    # Criar o arquivo ZIP contendo o Word e o PDF
-    zip_filename = f"{data['name_file']}.zip"
-    zip_path = os.path.join("uploads", zip_filename)
-
-    with zipfile.ZipFile(zip_path, 'w') as zipf:
-        zipf.write(word_output_path, os.path.basename(word_output_path))
-        zipf.write(os.path.join("uploads", pdf_filename), pdf_filename)
+    preencher_modelo_word(data, word_output_path)
 
     # Retornar o arquivo ZIP para o usuário baixar
-    return send_file(zip_path, as_attachment=True)
+    return send_file(word_output_path, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=3001)
