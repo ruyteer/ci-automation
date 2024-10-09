@@ -76,4 +76,5 @@ def gerar_ci():
     return send_file(word_output_path, as_attachment=True)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3001)
+    app.run(host='0.0.0.0', port=3001, debug=True)
+
