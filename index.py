@@ -28,6 +28,7 @@ def emails():
 
     # Ler emails quando a página inicial for carregada
     emails = ler_emails()
+    print(emails)
     
     return render_template("emails.html", emails=emails)
 

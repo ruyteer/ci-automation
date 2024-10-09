@@ -20,6 +20,7 @@ def ler_emails():
         # Procura por todos os emails
         result, data = mail.search(None, 'ALL')
         email_ids = data[0].split()
+        print(result, data, email_ids)
 
         emails = []
         
