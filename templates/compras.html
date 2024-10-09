@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <title>Automatizador de CI</title>
+    <script>
+      function addItem() {
+        const itemContainer = document.getElementById("items");
+        const itemDiv = document.createElement("div");
+        itemDiv.classList.add("item");
+
+        itemDiv.innerHTML = `
+          <input type="text" name="quantidade[]" placeholder="Quantidade" required />
+          <input type="text" name="descricao[]" placeholder="Descrição" required />
+          <input type="text" name="preco[]" placeholder="Preço" required />
+          <button type="button" onclick="removeItem(this)">Remover</button>
+        `;
+        itemContainer.appendChild(itemDiv);
+      }
+
+      function removeItem(button) {
+        const itemDiv = button.parentNode;
+        itemDiv.parentNode.removeChild(itemDiv);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Automatizador de CI</h1>
+      <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf" required />
+        <button type="submit">Carregar PDF</button>
+      </form>
+
+      {% if data %}
+      <h2>Processo concluído:</h2>
+      <form method="POST" action="{{ url_for('gerar_ci_compras') }}">
+        <!-- Grid com 3 colunas por linha -->
+        <div class="grid-container">
+          <div class="grid-item">
+            <label for="codigo_requisicao">Código Requisição:</label>
+            <input
+              type="text"
+              name="codigo_requisicao"
+              value="{{ data['codigo_requisicao'] }}"
+            />
+          </div>
+          <div class="grid-item">
+            <label for="solicitante">Solicitante:</label>
+            <input
+              type="text"
+              name="solicitante"
+              value="{{ data['solicitante'] }}"
+            />
+          </div>
+          <div class="grid-item">
+            <label for="local_entrega">Local de Entrega:</label>
+            <input
+              type="text"
+              name="local_entrega"
+              value="{{ data['local_entrega'] }}"
+            />
+          </div>
+          <div class="grid-item">
+            <label for="cod_arq">Código do Arquivo:</label>
+            <input type="text" name="cod_arq" placeholder="Código do Arquivo" />
+          </div>
+          <div class="grid-item">
+            <label for="data">Data:</label>
+            <input type="text" name="data" placeholder="04 de outubro" />
+          </div>
+          <div class="grid-item">
+            <label for="valor_total">Valor Total:</label>
+            <input
+              type="text"
+              name="valor_total"
+              value="{{ data['valor_total'] }}"
+            />
+          </div>
+          <div class="grid-item">
+            <label for="valor_total">Empresa:</label>
+            <input
+              type="text"
+              name="empresa"
+              value="{{ data['empresa'] }}"
+            />
+          </div>
+        </div>
+
+        <!-- Justificativa e Motivo em linhas completas -->
+        <div class="form-data">
+          <label for="justificativa">Justificativa:</label>
+          <textarea name="justificativa">{{ data['justificativa'] }}</textarea>
+        </div>
+
+        <div class="form-data">
+          <label for="motivo">Motivo:</label>
+          <textarea name="motivo" placeholder="Motivo"></textarea>
+        </div>
+
+        <!-- Nome do Arquivo -->
+        <div class="form-data">
+          <label for="name_file">Nome do Arquivo:</label>
+          <input
+            class="large-input"
+            type="text"
+            name="name_file"
+            value="CI - COMPRAS - DF00 (NUMERO) .2024 - {{ data['codigo_requisicao'] }} - DESCRICAO - {{ data['local_entrega'] }}"
+          />
+        </div>
+
+        <!-- Itens -->
+        <h3>Itens:</h3>
+        <div id="items">
+          {% for item in data['itens'] %}
+          <div class="item">
+            <input
+              type="text"
+              name="quantidade[]"
+              placeholder="Quantidade"
+              required
+            />
+            <input
+              type="text"
+              name="descricao[]"
+              placeholder="Descrição"
+              required
+            />
+            <input type="text" name="preco[]" placeholder="Preço" required />
+            <button type="button" onclick="removeItem(this)">Remover</button>
+          </div>
+          {% endfor %}
+        </div>
+        <button type="button" onclick="addItem()">Adicionar Item</button>
+        <button type="submit">Gerar CI</button>
+      </form>
+
+      <!-- Iframe para visualizar o PDF -->
+      <iframe
+        src="{{ url_for('upload_file', filename=pdf_filename) }}"
+      ></iframe>
+      {% endif %}
+    </div>
+  </body>
+</html>
