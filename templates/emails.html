@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitura de Emails - Outlook</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Emails Não Lidos</h1>
+
+    <div class="email-list">
+        {% if emails %}
+            <ul>
+                {% for email in emails %}
+                    <li>{{ email }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Nenhum email não lido encontrado.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

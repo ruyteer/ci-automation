@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, send_from_directory, send_fil
 import os
 from functions.get_req import get_data_from_req
 from functions.generate_ci import preencher_modelo_word
+from functions.get_emails import ler_emails
 import zipfile
 
 app = Flask(__name__)
@@ -19,6 +20,16 @@ def home():
             data = get_data_from_req(pdf_path)
             return render_template("index.html", data=data, pdf_filename=uploaded_file.filename)
     return render_template("index.html", data=None, pdf_filename=None)
+
+@app.route("/emails", methods=["GET"])
+def emails():
+    if not os.path.exists('uploads'):
+        os.makedirs('uploads')
+
+    # Ler emails quando a página inicial for carregada
+    emails = ler_emails()
+    
+    return render_template("emails.html", emails=emails)
 
 @app.route('/uploads/<filename>')
 def upload_file(filename):
