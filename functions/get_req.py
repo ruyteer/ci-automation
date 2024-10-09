@@ -1,7 +1,7 @@
 import re
 from PyPDF2 import PdfReader
 
-def get_data_from_podf(pdf_path):
+def get_data_from_req(pdf_path):
     reader = PdfReader(pdf_path)
     data = {
         'codigo_requisicao': '',
