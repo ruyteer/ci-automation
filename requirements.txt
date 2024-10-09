@@ -4,6 +4,3 @@ python-docx
 docxtpl
 aspose-words
 pypandoc
-imaplib
-smtplib
-email

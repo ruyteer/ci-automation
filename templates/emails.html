@@ -13,12 +13,17 @@
         {% if emails %}
             <ul>
                 {% for email in emails %}
-                    <li>{{ email }}</li>
+                    <li>
+                        <p class="email-subject">{{ email.subject }}</p>
+                        <p class="email-from">{{ email.from }}</p>
+                        <p class="email-date">{{ email.date }}</p>
+                    </li>
                 {% endfor %}
             </ul>
         {% else %}
             <p>Nenhum email não lido encontrado.</p>
         {% endif %}
     </div>
+    
 </body>
 </html>
