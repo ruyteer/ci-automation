@@ -8,6 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 COPY index.py .
 COPY modelo_ci.docx .
+COPY modelo_compras.docx .
 COPY templates/ templates/
 COPY static/ static/
 COPY uploads/ uploads
