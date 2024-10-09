@@ -4,11 +4,11 @@ from PyPDF2 import PdfReader
 def get_data_from_req(pdf_path):
     reader = PdfReader(pdf_path)
     data = {
-        'codigo_requisicao': None,
-        'solicitante': None,
-        'local_entrega': None,
-        'justificativa': None,
-        'valor_total': None,
+        'codigo_requisicao': '',
+        'solicitante': '',
+        'local_entrega': '',
+        'justificativa': '',
+        'valor_total': '',
         'itens': []
     }
 
@@ -17,9 +17,15 @@ def get_data_from_req(pdf_path):
         if text:
             text = text.replace('\n', ' ').strip()
 
+        
             codigo_match = re.search(r'REQDF[-\s]*(\d+)', text)
             if codigo_match:
                 data['codigo_requisicao'] = f"REQDF-{codigo_match.group(1).strip()}"
+            else:
+                po_codigo_match = re.search(r'PODF[-\s]*(\d+)', text)
+                if po_codigo_match:
+                    data['codigo_requisicao'] = f"PODF-{po_codigo_match.group(1).strip()}"
+
 
             solicitante_match = re.search(r'Solicitante\s+([A-Z\s]+)\s+Fornecedor', text)
             if solicitante_match:
