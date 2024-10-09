@@ -6,22 +6,23 @@ from datetime import datetime
 # Configurações de login e servidor
 IMAP_SERVER = 'outlook.office365.com'
 EMAIL_ACCOUNT = 'ruarocha@universal.org'
-PASSWORD = 'Ruyter99.'
+PASSWORD = 'yamahaS900'
 
 def ler_emails():
-    # Conecta ao servidor de email para leitura
-    mail = imaplib.IMAP4_SSL(IMAP_SERVER)
-    mail.login(EMAIL_ACCOUNT, PASSWORD)
-    mail.select('inbox')
+    try:
+        mail = imaplib.IMAP4_SSL(IMAP_SERVER)
+        mail.login(EMAIL_ACCOUNT, PASSWORD)
+        print("Login bem-sucedido!")
+        mail.logout()
 
-    # Procura por emails não lidos
-    result, data = mail.search(None, 'UNSEEN')
-    email_ids = data[0].split()
+         # Procura por emails não lidos
+        result, data = mail.search(None, 'UNSEEN')
+        email_ids = data[0].split()
 
-    emails = []
-    for email_id in email_ids:
-        result, data = mail.fetch(email_id, '(RFC822)')
-        raw_email = data[0][1]
+        emails = []
+        for email_id in email_ids:
+          result, data = mail.fetch(email_id, '(RFC822)')
+          raw_email = data[0][1]
         
         # Decodifica o email
         msg = email.message_from_bytes(raw_email)
@@ -46,5 +47,9 @@ def ler_emails():
             'date': date_,
         })
     
-    mail.logout()
-    return emails
+        mail.logout()
+        return emails
+    except imaplib.IMAP4.error as e:
+        print(f"Falha no login: {e}")
+
+   
