@@ -23,6 +23,20 @@ def home():
     return render_template("index.html", data=None, pdf_filename=None)
 
 
+@app.route("/compras", methods=["GET", "POST"])
+def compras():
+    if not os.path.exists('uploads'):
+        os.makedirs('uploads')
+
+    if request.method == "POST":
+        uploaded_file = request.files['file']
+        if uploaded_file.filename.endswith('.pdf'):
+            pdf_path = os.path.join("uploads", uploaded_file.filename)
+            uploaded_file.save(pdf_path)
+            data = get_data_from_req(pdf_path)
+            return render_template("compras.html", data=data, pdf_filename=uploaded_file.filename)
+    return render_template("compras.html", data=None, pdf_filename=None)
+
 @app.route("/emails", methods=["GET"])
 def emails():
     if not os.path.exists('uploads'):
